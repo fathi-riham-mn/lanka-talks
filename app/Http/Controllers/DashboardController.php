@@ -8,6 +8,7 @@ use App\Models\Users;
 use App\Models\Categories;
 use App\Models\BlogCategory;
 use Illuminate\Http\Request;
+use DB;
 
 class DashboardController extends Controller
 {
@@ -61,6 +62,22 @@ class DashboardController extends Controller
         $noDataMessage = $posts->isEmpty() ? 'No Data Found' : '';
     
         return view('table', compact('posts', 'noDataMessage'));
+    }
+
+
+    public function publisherTracker(Request $request) {
+        $startDate = $request->input('s_start_date');
+        $endDate = $request->input('s_end_date');
+
+        $results = DB::table('tl_blogs')
+                    ->select('tl_users.id', 'tl_users.name', DB::raw('COUNT(tl_blogs.id) as total_posts'))
+                    ->join('tl_users', 'tl_blogs.user_id', '=', 'tl_users.id')
+                    ->whereBetween('tl_blogs.created_at', [$startDate, $endDate])
+                    ->where ('is_publish', 1)
+                    ->groupBy('tl_users.id', 'tl_users.name')
+                    ->get();
+
+        return view('table2', ['results' => $results]);
     }
     
 

@@ -185,6 +185,45 @@
     </div> <!-- .col-12 -->
 
 </div> <!-- .row -->
+
+--
+<div class="row my-4">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="card-header">
+                    <strong class="card-title">Daily Publisher Tracker</strong>
+                </div>
+                <div class="card-body">
+
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <label for="example-date">Start Date</label>
+                                <input class="form-control s_start_date" name="s_start_date" type="date">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="example-date">End Date</label>
+                                <input class="form-control s_end_date" name="s_end_date" type="date">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary float-right searchbtn">
+                            <span class="fe fe-filter fe-16 text-muted"></span> Search
+                        </button>
+                   
+                </div>
+            </div>
+            <div class="table2-data">
+                @include('table2')
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div> <!-- .col-12 -->
+
+</div> <!-- .row -->
+
 @endsection
 
 @push('script')
@@ -219,6 +258,27 @@
         }
     });
 });
+
+</script>
+
+<script>
+    $(document).on('click', '.searchbtn', function (e) {
+        var s_start_date = $('.s_start_date').val();
+        var s_end_date = $('.s_end_date').val();
+
+        $.ajax({
+            url: "{{ route('publisher.tracker') }}",
+            type: "POST",
+            data: {
+                s_start_date: s_start_date,
+                s_end_date: s_end_date,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function (data) {
+                $('.table2-data').html(data);
+            }
+        });
+    });
 
 
 $(document).on('click', '.clearbtn', function(e){
