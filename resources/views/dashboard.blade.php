@@ -123,9 +123,9 @@
 
 
                         <div class="form-group col-md-3">
-                          <label for="multi-select2">Multiple Select</label>
+                          <label for="multi-select2">Admin</label>
                           <select class="form-control select2-multi user_name"  id="multi-select2">
-                            <optgroup label="Mountain Time Zone">
+                            <optgroup label="Admins">
                               @if ($users->isNotEmpty())
                               @foreach ($users as $user)
                                   <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -134,19 +134,21 @@
                             </optgroup>
                           </select>
                         </div> <!-- form-group -->
-
+                      
                         <div class="form-group col-md-3">
-                          <label for="inputState">Category</label>
-                          <select id="" class="form-control post_category" name="category">
-                            <option  value="" disabled  selected>All Category</option>
-                            @if ($categories->isNotEmpty())
-                            @foreach ($categories as $category)
-                              <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                            @endif
-                          </select>
-                        </div>
-
+    <label for="select2Multiple">Category</label>
+    <select class="form-control select2-multi post_category" id="select2Multiple" multiple>
+        <optgroup label="Categories">
+        <option value="all">All Categories</option> <!-- Add this option -->
+        @if ($categories->isNotEmpty())
+            @foreach ($categories as $category)
+                <option value="{{ $category->id }}">{{ $category->name }}</option>
+            @endforeach
+        @endif
+        </optgroup>
+    </select>
+</div>
+                       
                         <div class="form-group col-md-3">
                           <label for="example-date">Start Date</label>
                           <input class="form-control start_date"  name="start_date" type="date" name="date">
@@ -159,7 +161,10 @@
 
                       </div>
 
-                      <button type="button" class="btn btn-primary float-right fiterbtn "><span class="fe fe-filter fe-16 text-muted"></span></button>
+                      <button type="button" class="btn btn-secondary float-right mr-2 clearbtn"><span class="fe fe-x fe-16 text-muted"></span></button>
+
+
+                      <button type="button" class="btn btn-primary float-right mr-2 fiterbtn "><span class="fe fe-filter fe-16 text-muted"></span></button>
 
                   </div>
                 </div> <!-- / .card-body -->
@@ -180,97 +185,53 @@
     </div> <!-- .col-12 -->
 
 </div> <!-- .row -->
---
-<div class="row my-4">
-    <div class="col-md-12 mb-4">
-        <div class="card shadow">
-            <div class="card-body">
-                <div class="card-header">
-                    <strong class="card-title">Daily Publisher Tracker</strong>
-                </div>
-                <div class="card-body">
-
-                        <div class="form-row">
-                            <div class="form-group col-md-3">
-                                <label for="example-date">Start Date</label>
-                                <input class="form-control s_start_date" name="s_start_date" type="date">
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label for="example-date">End Date</label>
-                                <input class="form-control s_end_date" name="s_end_date" type="date">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary float-right searchbtn">
-                            <span class="fe fe-filter fe-16 text-muted"></span> Search
-                        </button>
-                   
-                </div>
-            </div>
-            <div class="table2-data">
-                @include('table2')
-            </div>
-        </div>
-    </div>
-</div>
-
-
-</div> <!-- .col-12 -->
-
-</div> <!-- .row -->
-
-
 @endsection
 
 @push('script')
 <script src="{{ asset('assets/js/apps.js') }}"></script>
 <script>
-    $(document).on('click','.fiterbtn',function(e){
+   $(document).on('click', '.fiterbtn', function(e){
+    var user_count = $('.user_name').val();
+    var category = $('.post_category').val();
+    var start_date = $('.start_date').val();
+    var end_date = $('.end_date').val();
+    
+    $('.lodder').removeClass('d-none');
 
-        var user_count   =   $('.user_name').val();
-        var category     =   $('.post_category').val();
-        var start_date   =   $('.start_date').val();
-        var end_date     =   $('.end_date').val();
-        $('.lodder').removeClass('d-none');
-      //  alert(user_count);
-        $.ajax({
-                url:"{{ route('filter.data') }}",
-                type: "POST",
-                data: {
-                    user: user_count,
-                    category:category,
-                    start_date:start_date,
-                    end_date:end_date,
-                    _token: '{{csrf_token()}}'
-                },
+    // If "All Categories" is selected, reset the category variable
+    if (category.includes("all")) {
+        category = []; // Clear the category selection to fetch all posts
+    }
 
-                success: function (data) {
-                  $('.lodder').addClass('d-none');
-                //  $('.short-by').html('Custom');
-                    $('.table-data').html(data);
-                }
-        });
-});
-</script>
-
-<script>
-    $(document).on('click', '.searchbtn', function (e) {
-        var s_start_date = $('.s_start_date').val();
-        var s_end_date = $('.s_end_date').val();
-
-        $.ajax({
-            url: "{{ route('publisher.tracker') }}",
-            type: "POST",
-            data: {
-                s_start_date: s_start_date,
-                s_end_date: s_end_date,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function (data) {
-                $('.table2-data').html(data);
-            }
-        });
+    $.ajax({
+        url: "{{ route('filter.data') }}",
+        type: "POST",
+        data: {
+            user: user_count,
+            category: category,
+            start_date: start_date,
+            end_date: end_date,
+            _token: '{{ csrf_token() }}'
+        },
+        success: function (data) {
+            $('.lodder').addClass('d-none');
+            $('.table-data').html(data);
+        }
     });
+});
+
+
+$(document).on('click', '.clearbtn', function(e){
+        $('.user_name').val(null).trigger('change'); // Clear multi-select
+        $('.post_category').val(null).trigger('change'); // Clear category select
+        $('.start_date').val(""); // Clear start date
+        $('.end_date').val(""); // Clear end date
+        $('.table-data').html(""); // Optionally clear table data
+    });
+
 </script>
+
+
 
 <script type="text/javascript">
  $(document).ready(function () {
@@ -325,5 +286,4 @@ barChartjs &&
 
 
 </script>
-
 @endpush
