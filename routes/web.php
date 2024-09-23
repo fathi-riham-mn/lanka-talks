@@ -22,4 +22,3 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'index'])->name('index');
 Route::post('filter/data',[DashboardController::class, 'filter'])->name('filter.data');
-Route::post('publisher/tracker', [DashboardController::class, 'publisherTracker'])->name('publisher.tracker');

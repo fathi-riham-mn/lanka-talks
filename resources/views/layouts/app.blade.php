@@ -129,6 +129,11 @@
         multiple: true,
         theme: 'bootstrap4',
       });
+      $('.select3-multi').select2(
+      {
+        multiple: true,
+        theme: 'bootstrap4',
+      });
       $('.drgpicker').daterangepicker(
       {
         singleDatePicker: true,
