@@ -13,8 +13,10 @@ use DB;
 class DashboardController extends Controller
 {
     public function index(Request $request) {
-        $users = Users::Where('user_type',1)->get();
-        $blogs = Blogs::get();
+    
+        $users = Users::where ('user_type', 1)->get();
+        $blogs = Blogs::where ('is_publish', 1)->get();
+
         $categories = Categories::get();
 
         $views = 0;
